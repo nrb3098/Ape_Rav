@@ -1,0 +1,19 @@
+@import 'primeicons/primeicons.css';
+@import '/node_modules/flowbite-vue/dist/index.css'
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+
+html, body {
+    font-family: 'Work Sans', sans-serif !important;
+    width: 100%;
+  }
+  
+  
+

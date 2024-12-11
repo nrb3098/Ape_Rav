@@ -105,23 +105,26 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import axios from "axios";
 import LineChart from "@/components/LineChart.vue";
 import BarChart from "@/components/BarChart.vue";
 import EnFormacion from "@/assets/images/EnFormacion.png";
 import Certificados from "@/assets/images/Certificados.png";
 import EnProceso from "@/assets/images/PorCertificar.png";
 
+// Función para obtener los datos de metas
+
 // Datos de las imágenes estáticas y sus títulos
 const imagePaths = ref([
 	{
 		title: "ORIENTADOS",
-		count: "12883124",
+		count: 0,
 		path: EnFormacion,
 	},
 	{
 		title: "COLOCADOS",
-		count: "9888112",
+		count: 0,
 		path: Certificados,
 	},
 	{
@@ -129,8 +132,31 @@ const imagePaths = ref([
 		count: "85883161",
 		path: EnProceso,
 	},
-
+	
 ]);
+
+const loading = ref(false);
+const errorMessage = ref("");
+
+const fetchMetaData = async () => {
+  try {
+	loading.value = true;
+	const response = await axios.get("http://localhost:5010/api/v1/metas/totalMetas");
+	const data = response.data;
+
+	// Actualizar valores de count en imagePaths
+	imagePaths.value = [
+	  { ...imagePaths.value[0], count: data.total_orientados },
+	  { ...imagePaths.value[1], count: data.total_colocados },
+	  { ...imagePaths.value[2], count: data.total_inscritos },
+	];
+  } catch (error) {
+	console.error("Error fetching data:", error);
+	errorMessage.value = "Hubo un error al cargar los datos de metas.";
+  } finally {
+	loading.value = false;
+  }
+};
 
 // Datos de ejemplo para la tabla
 const tableData = ref([
@@ -139,6 +165,12 @@ const tableData = ref([
 	{ Departamento: 3, Estado: "Alfredo Quinquilla", Fecha: 1967 },
 	{ Departamento: 4, Estado: "Jorge Raul", Fecha: 2004 },
 ]);
+
+
+// Llamar a la función cuando se monte el componente
+onMounted(() => {
+	fetchMetaData();
+});
 </script>
 
 <style scoped>
